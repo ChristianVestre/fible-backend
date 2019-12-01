@@ -10,6 +10,7 @@ import initPassport from './initPassport'
 import cors from 'cors'
 // @ts-ignore
 import {buildContext} from 'graphql-passport';
+const passwords = require('../passwords.json')
 
 
 const app = express()
@@ -26,7 +27,7 @@ initPassport();
 const client = redis.createClient({
     port:14082,
     host:'redis-14082.c55.eu-central-1-1.ec2.cloud.redislabs.com',
-    password:'dKrGXj9Al1kUM0v4gzaAXfNHa7AAEfrE'
+    password: passwords.redis
 })
 
 const corsOptions = {

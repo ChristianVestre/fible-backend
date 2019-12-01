@@ -1,6 +1,7 @@
 
 
 const { Client } = require('@elastic/elasticsearch')
+const passwords = require('./../../passwords.json')
 
 const elasticsearchClient = new Client({
     cloud:{
@@ -8,7 +9,7 @@ const elasticsearchClient = new Client({
     },
     auth: {
         username: 'elastic',
-        password: 'wu8COQ4y539KHpMxPMWCj11k',
+        password: passwords.elasticsearch,
     }
   })
 
@@ -34,6 +35,14 @@ export const indexRoutes =  async function (body:Object){
 export const index =  async function (body:Object, index:String){
   return await elasticsearchClient.index({index: index,
   pipeline: 'rename_id',
+  body:body})
+}
+
+
+
+export const indexwithpipeline =  async function (body:Object, index:String,pipeline:String){
+  return await elasticsearchClient.index({index: index,
+  pipeline: pipeline,
   body:body})
 }
 

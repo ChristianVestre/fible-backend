@@ -5,6 +5,7 @@ import uuid from 'uuid/v4'
 import { duplicateVariableMessage } from 'graphql/validation/rules/UniqueVariableNames';
 import updateMutations from './updateMutations'
 import getQueries from './getQueries'
+import setMutation from './setMutation'
 
 
 
@@ -28,7 +29,7 @@ export default  {
                     POIS:[""],
                     email:args.email.toLowerCase(),
             }
-            let comfimation = await indexUser({
+            let confirmation = await indexUser({
                 index: 'users',
                 pipeline: 'rename_id',
                 body: data
@@ -98,7 +99,8 @@ export default  {
             context.login(newUser);
             return { user: newUser };
           },
-          ...updateMutations
+          ...updateMutations,
+          ...setMutation
     }
 };
 

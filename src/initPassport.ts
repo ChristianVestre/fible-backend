@@ -38,7 +38,7 @@ const initPassport = () => {
 
 
   passport.serializeUser((user: any, done) => {
-
+    console.log(user)
     done(null, user.id);
   });
 

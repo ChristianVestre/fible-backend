@@ -3,8 +3,9 @@ export default gql`
 type Query {
     getUser(id:ID, password:String):User
     getRoutes:[Route]
-    getStop(id:ID):Stop
-    getPoi(id:ID):Poi
+    getStops:[Stop]
+    getPoi:[Poi]
+    getRouteWithComponents:[RouteWithComponent]
     me: User
 }
 type Mutation {
@@ -12,7 +13,7 @@ type Mutation {
     setRoute(name:String, ROUTES:String, POIS:String, STOPS:String):Route
     setStop:Stop
     setPoi:Poi
-    setComponent:Component
+    setComponent(content:String, type:String):Component
     deleteUser(id:ID):User
     deleteRoute(id:ID):Route
     deleteStop(id:ID):Stop
@@ -33,6 +34,11 @@ type Mutation {
 type AuthPayload {
     user: User
   }
+
+type RouteWithComponent {
+    route: Route,
+    components:[Component]
+}
 
 type User {
     id:ID!

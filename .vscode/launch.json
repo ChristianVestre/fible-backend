@@ -5,9 +5,19 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Launch via npm",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["start", "debug"],
+            "port": 8000
+          },
+        {
             "type": "node",
             "request": "launch",
             "name": "Launch via NPM",
+            "protocol": "inspector",
             "runtimeExecutable": "npm",
             "runtimeArgs": [
                 "run",
