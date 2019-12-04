@@ -2,10 +2,10 @@ import {search} from './../db/db'
 import cookie from 'cookie'
 
 export default  {
-
         getRoutes: async (_:any, __:any, context:any) => {
-            console.log(context.getUser())
-        const routeIds:Array<String> =  context.getUser().ROUTES
+        const routeIds:Array<String> =  context.getUser().routes
+        console.log(routeIds)
+        if(routeIds){
         const body = {
             "query": {
               "bool": {
@@ -21,18 +21,66 @@ export default  {
           }
         let routes = await search(body,'routes')
         routes = routes.body.hits.hits.map((route:any) => route._source )
-        console.log(routes)
         return routes
+        }
+        return [null]
         },
+        getStops: async (_:any, __:any, context:any) => {
+          const stopIds:Array<String> =  context.getUser().stops
+          console.log(stopIds)
+          if(stopIds){
+          const body = {
+              "query": {
+                "bool": {
+                  "should": [
+                    {
+                      "ids": {
+                        "values": stopIds
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          let stops = await search(body,'stops')
+          stops = stops.body.hits.hits.map((stop:any) => stop._source )
+          return stops
+          }
+          return [null]
+          },
+          getPois: async (_:any, __:any, context:any) => {
+            const poiIds:Array<String> =  context.getUser().pois
+            if(poiIds){
+            const body = {
+                "query": {
+                  "bool": {
+                    "should": [
+                      {
+                        "ids": {
+                          "values": poiIds
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            let pois = await search(body,'routes')
+            console.log(pois)
+            pois = pois.body.hits.hits.map((route:any) => route._source )
+            return pois
+            }
+            return [null]
+            },
         getRouteWithComponents: async (_:any, __:any, context:any) => {
-          //console.log(cookie.parse(context.req.headers.cookie))
+          //console.log(context)
+          console.log(cookie.parse(context.req.headers.cookie_2))
           const routeBody = {
             "query": {
               "bool": {
                 "should": [
                   {
                     "ids": {
-                      "values": cookie.parse(context.req.headers.cookie).hid
+                      "values": cookie.parse(context.req.headers.cookie_2).hid
                     }
                   }
                 ]

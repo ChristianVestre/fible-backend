@@ -45,4 +45,14 @@ PUT /components
     }
   ]
 }
+PUT /components/_doc/oijfeoj?pipeline=indexed_at_and_rename_id
+{
+      "id":"oijfeoj",
+      "type": "headline",
+      "parentid":  "kgrnkge", 
+      "ownerid":  "kjenfkwenf", 
+      "ownername": "christian",
+      "content": {"headline":"Christians fjord route"}
+  
+}
 `

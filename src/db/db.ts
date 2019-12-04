@@ -2,7 +2,7 @@
 
 const { Client } = require('@elastic/elasticsearch')
 const passwords = require('./../../passwords.json')
-
+console.log(passwords.elasticsearch)
 const elasticsearchClient = new Client({
     cloud:{
         id:'fible-backend:ZXVyb3BlLXdlc3QzLmdjcC5jbG91ZC5lcy5pbyRhNDNmYzM2NWMyMTA0YTMxYjY2YmM5NzNjOGZlZDZmMiQ3YmFjOTJlNDBhZGM0ZWNiOGJiMzFlZWIyZDEyNmYzNQ==',

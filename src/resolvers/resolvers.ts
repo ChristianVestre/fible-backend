@@ -6,7 +6,7 @@ import { duplicateVariableMessage } from 'graphql/validation/rules/UniqueVariabl
 import updateMutations from './updateMutations'
 import getQueries from './getQueries'
 import setMutation from './setMutation'
-
+var now = new Date();   
 
 
 const saltRounds = 4;
@@ -14,86 +14,44 @@ const saltRounds = 4;
 export default  {
     Query: {
         me: (_:any, __:any, context:any) => {
+            console.log(context)
+            console.log(context.getUser())
         return context.getUser()
         },
         ...getQueries
     },
     Mutation: {
-        setUser: async (_:any,args:any,context:any) => {
-            let data = {
-                    id:args.id,
-                    name:args.name,
-                    password:await bcrypt.hash(args.password, saltRounds),
-                    ROUTES:[""],
-                    STOPS:[""],
-                    POIS:[""],
-                    email:args.email.toLowerCase(),
-            }
-            let confirmation = await indexUser({
-                index: 'users',
-                pipeline: 'rename_id',
-                body: data
-            })
-            return data
-        },
-        setRoute: async (_:any,args:any,context:any) => {
-            const routeId = uuid()
-            let route = {
-                id:routeId,
-                owner: context.getUser().id,
-                ownername:context.getUser().name,
-                name: "",
-                image:"",
-                STOPS:[""],
-                POIS:[""],
-                order:[""],
-                components:[""],
-                images:[""],
-                location:[""],
-            }
-            indexRoutes(route)
-           // console.log(context.getUser().id)
-            const body = {
-                "script" : {
-                    "source": "if (ctx._source.ROUTES == null) {ctx._source.ROUTES = new ArrayList();} ctx._source.ROUTES.add(params.route);",
-                    "lang": "painless",
-                    "params" : {
-                        "route" : context.getUser().id
-                    }
-                }
-            }
-            update(body, 'users',context.getUser().id)
-            return route
-        },
         login: async (_:any, { email, password }:any, context:any) => {
 
             const { user } = await context.authenticate('graphql-local', { email, password });
+            //set lastlogin on the user in elasticsearch
             context.login(user)
             return { user }
           },
           logout: (_:any, args:any, context:any) => context.logout(),
-          signup: async (_:any, { name, email, password }:any, context:any) => {
-            const existingUsers = await search({
+          setUser: async (_:any, { name, email, password }:any, context:any) => {
+          const  existingUser = await search({
                 "query": {
                 "term": {
-                    "email.keyword": {
+                    "email": {
                         "value": email,
                         "boost": 1.0
                     }
                 }
             }
         }, 'users')
-            if (existingUsers.body.hits.hits[0] != undefined) {
+            if (existingUser.body.hits.hits[0] != undefined) {
               throw new Error('User with email already exists');
-            }
+            } 
             const newUser = {
-                id:uuid(),
+                id:"uu_"+uuid(),
                 name:name,
                 password:await bcrypt.hash(password, saltRounds),
-                ROUTES:null,
-                STOPS:null,
-                POIS:null,
+                routes:null,
+                stops:null,
+                pois:null,
                 email:email.toLowerCase(),
+                lastlogin:now
             }
             indexUser(newUser)
             context.login(newUser);

@@ -4,32 +4,36 @@ type Query {
     getUser(id:ID, password:String):User
     getRoutes:[Route]
     getStops:[Stop]
-    getPoi:[Poi]
-    getRouteWithComponents:[RouteWithComponent]
+    getPois:[Poi]
+    getRouteWithComponents:RouteWithComponent
     me: User
 }
 type Mutation {
-    setUser(id:ID,name:String,email:String, password:String):User
-    setRoute(name:String, ROUTES:String, POIS:String, STOPS:String):Route
+    setUser(name:String!,email:String!, password:String!):AuthPayload
+    setRoute(name:String):Route
     setStop:Stop
     setPoi:Poi
-    setComponent(content:String, type:String):Component
+    setComponent(content:String, type:String, parentid:String):Component
     deleteUser(id:ID):User
     deleteRoute(id:ID):Route
     deleteStop(id:ID):Stop
     deletePoi(id:ID):Poi
     deleteComponent(id:ID):Component
-    updateUser(id:ID, name:String, ROUTES:String):User
+    updateUser(id:ID, name:String, htypeid:String, htype:String):User
     updateRoute(id:ID, name:String):Route
     updateStop(id:ID):Stop
     updatePoi(id:ID):Poi
     updateComponent(id:ID):Component
-    signIn(id:String,password:String):User
-    signup(name: String!, email: String!, password: String!): AuthPayload
     login(email: String!, password: String!): AuthPayload
     logout: Boolean
 }
 
+
+type File {
+    filename: String!
+    mimetype: String!
+    encoding: String!
+  }
 
 type AuthPayload {
     user: User
@@ -41,24 +45,24 @@ type RouteWithComponent {
 }
 
 type User {
-    id:ID!
+    id:String
     name:String
     password:String
-    ROUTES:[String]
-    STOPS:[String]
-    POIS:[String]
+    routes:[String]
+    stops:[String]
+    pois:[String]
     email:String
 }
 
 type Route {
-    id: ID
-    owner:ID
+    id: String
+    ownerid:ID
+    ownername:String
     name: String
-    image:String
-    STOPS:String
-    POIS:String
-    order:String
-    components:String
+    image:File
+    stops:[String]
+    pois:[String]
+    components:[String]
     images:String
     location:String
 }
@@ -70,25 +74,24 @@ type StopPreview {
 
 type Stop {
     id: ID!
-    owner:ID
+    ownerid:ID
+    ownername:String
     name: String
-    image:[Image]
-    POIS:[Poi]
-    order:[ID]
-    components:[Component]
-    images:[Image]
+    image:File
+    POIS:[String]
+    components:[String]
+    images:[File]
     location:Location
 } 
 
 type Poi {
     id: ID!
-    owner:ID
+    ownerid:ID
+    ownername:String
     name: String
-    image:[Image]
-    POIS:[Poi]
-    order:[ID]
-    components:[Component]
-    images:[Image]
+    image:File
+    components:[String]
+    images:[File]
     location:Location
 }
 
@@ -116,11 +119,6 @@ type Location{
     address:String
 }
 
-type Image{
-    id:ID!
-    url:String
-    name:String
-}
 
 `
 /*

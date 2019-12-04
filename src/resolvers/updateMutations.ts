@@ -1,4 +1,5 @@
 import {update }from './../db/db'
+var now = new Date();   
 export default  {
     updateUser: async (_:any,args:any,context:any) => {
         //  console.log(args)
@@ -6,7 +7,8 @@ export default  {
                   body: {
                     doc: {
                       'name' :args.name,
-                      'ROUTES':args.ROUTES,
+                      [args.htype]:args.htypeid,
+                      lasteditat:now
                     }
                   }}
           ,'users',context.getUser().id)
@@ -18,6 +20,7 @@ export default  {
                 
                     doc: {
                       'name' :args.name,
+                      lasteditat:now
                     }
                   }
           ,'routes',args.id)

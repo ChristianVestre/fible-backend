@@ -7,9 +7,11 @@ import bcrypt from 'bcrypt'
 
 
 
+
 const initPassport = () => {
   passport.use(
     new GraphQLLocalStrategy(async (email: any, password: any, done: any) => {
+      email = email.toLowerCase()
       let user = await search({
         "query": {
           "term": {
@@ -19,7 +21,6 @@ const initPassport = () => {
           }
         }
       },'users')
-      //console.log(user)
       let error = null
       if (user.body.hits.total.value == 0) {
         console.log('hits = 0')
