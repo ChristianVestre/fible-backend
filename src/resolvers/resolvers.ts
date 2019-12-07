@@ -51,7 +51,8 @@ export default  {
                 stops:null,
                 pois:null,
                 email:email.toLowerCase(),
-                lastlogin:now
+                lastlogin:now,
+                createdat:now
             }
             indexUser(newUser)
             context.login(newUser);

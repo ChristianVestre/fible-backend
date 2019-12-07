@@ -5,7 +5,7 @@ type Query {
     getRoutes:[Route]
     getStops:[Stop]
     getPois:[Poi]
-    getRouteWithComponents:RouteWithComponent
+    getHtypeWithComponents:HtypeWithComponent
     me: User
 }
 type Mutation {
@@ -13,7 +13,7 @@ type Mutation {
     setRoute(name:String):Route
     setStop:Stop
     setPoi:Poi
-    setComponent(content:String, type:String, parentid:String):Component
+    setComponent(content:String, type:String, parentid:String, htype:String):Component
     deleteUser(id:ID):User
     deleteRoute(id:ID):Route
     deleteStop(id:ID):Stop
@@ -39,9 +39,14 @@ type AuthPayload {
     user: User
   }
 
-type RouteWithComponent {
-    route: Route,
+type HtypeWithComponent {
+    htype: Htype,
     components:[Component]
+}
+type Htype{
+    route:Route
+    stop:Stop
+    poi:Poi
 }
 
 type User {
@@ -106,7 +111,7 @@ enum ComponentType {
 }
 
 type Component{
-    id:ID!
+    id:String
     type:String
     content:String
     links:[String]
