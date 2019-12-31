@@ -14,8 +14,8 @@ const saltRounds = 4;
 export default  {
     Query: {
         me: (_:any, __:any, context:any) => {
-            console.log(context)
-            console.log(context.getUser())
+            //console.log(context)
+            //console.log(context.getUser())
         return context.getUser()
         },
         ...getQueries
@@ -27,10 +27,11 @@ export default  {
             //set lastlogin on the user in elasticsearch
             context.login(user)
             return { user }
-          },
-          logout: (_:any, args:any, context:any) => context.logout(),
-          setUser: async (_:any, { name, email, password }:any, context:any) => {
-          const  existingUser = await search({
+            },
+            logout: (_:any, args:any, context:any) => context.logout(),
+            setUser: async (_:any, { name, email, password }:any, context:any) => {
+            try{
+            const  existingUser = await search({
                 "query": {
                 "term": {
                     "email": {
@@ -43,18 +44,24 @@ export default  {
             if (existingUser.body.hits.hits[0] != undefined) {
               throw new Error('User with email already exists');
             } 
+        }catch(error){console.error(error)}
             const newUser = {
                 id:"uu_"+uuid(),
                 name:name,
                 password:await bcrypt.hash(password, saltRounds),
-                routes:null,
-                stops:null,
-                pois:null,
+                routes:[],
+                stops:[],
+                pois:[],
                 email:email.toLowerCase(),
                 lastlogin:now,
                 createdat:now
             }
-            indexUser(newUser)
+            try{
+            const resp = await indexUser(newUser)
+            console.log(resp)
+            } catch(error){
+                console.error(error)
+            }
             context.login(newUser);
             return { user: newUser };
           },

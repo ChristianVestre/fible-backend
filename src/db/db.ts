@@ -3,6 +3,7 @@
 const { Client } = require('@elastic/elasticsearch')
 const passwords = require('./../../passwords.json')
 console.log(passwords.elasticsearch)
+/*
 const elasticsearchClient = new Client({
     cloud:{
         id:'fible-backend:ZXVyb3BlLXdlc3QzLmdjcC5jbG91ZC5lcy5pbyRhNDNmYzM2NWMyMTA0YTMxYjY2YmM5NzNjOGZlZDZmMiQ3YmFjOTJlNDBhZGM0ZWNiOGJiMzFlZWIyZDEyNmYzNQ==',
@@ -12,7 +13,13 @@ const elasticsearchClient = new Client({
         password: passwords.elasticsearch,
     }
   })
-
+*/
+const elasticsearchClient = new Client({
+  node: 'http://46.101.144.52:9200',
+  maxRetries: 5,
+  requestTimeout: 60000,
+  sniffOnStart: true
+})
 
 export const search = async  function (body:any, index:String) {
     return await elasticsearchClient.search({ index: index,
@@ -49,7 +56,11 @@ export const indexwithpipeline =  async function (body:Object, index:String,pipe
 export const update =  async function (body:Object, index:String, id:String){
   return await elasticsearchClient.update({index: index,
   id:id,
-  type:"_doc",
   body:body})
 }
 
+export const remove =  async function (index:String, id:String){
+  return await elasticsearchClient.delete({index: index,
+  id:id,
+  refresh:"wait_for"})
+}

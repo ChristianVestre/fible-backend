@@ -1,96 +1,137 @@
 import {indexwithpipeline, update, indexRoutes }from './../db/db'
 import uuid = require('uuid')
 import cookie  from 'cookie'
+import { findHtype } from '../helperFunction';
 
 var now = new Date();   
 export default  {
-    setRoute: async (_:any,{name}:any,context:any) => {
-        const routeId = "rt_"+uuid()
-        let route = {
-            id:routeId,
+    setRoute: async (_:any,{route}:any,context:any) => {
+        route = JSON.parse(route)
+        console.log(route)
+        let newRoute = {
+            id:route.id,
             ownerid: context.getUser().id,
             ownername:context.getUser().name,
-            name:name,
+            name:route.name,
             image:"",
-            stops:[null],
-            pois:[null],
-            components:[null],
-            locations:[null],
+            stops:[],
+            pois:[],
+            components:[],
+            locations:[],
             lasteditat:now,
             createdat:now
         }
-        indexRoutes(route)
+        indexRoutes(newRoute)
         const body = {
             "script" : {
                 "source": "if (ctx._source.routes == null) {ctx._source.routes = new ArrayList();} ctx._source.routes.add(params.route);",
                 "lang": "painless",
                 "params" : {
-                    "route" : routeId
+                    "route" : route.id
                 }
             }
         }
-        update(body, 'users',context.getUser().id)
+        
+        try{
+        await update(body, 'users',context.getUser().id)
+        } catch(error){
+            console.log(error)
+        }
+
+
         return route
     },
-    setStop: async (_:any,args:any,context:any) => {
-        const stopId = "st_" + uuid()
-        const parentid = args.parentid == undefined ? '': args.parentid
-        let stop = {
-            id:stopId,
+    setStop: async (_:any,{stop}:any,context:any) => {
+        stop = JSON.parse(stop)
+        console.log(stop)
+        let newStop = {
+            id:stop.id,
             ownerid: context.getUser().id,
             ownername:context.getUser().name,
-            parentids:[parentid],
-            name: args.name,
+            parentids:[],
+            name: stop.name,
             image:"",
-            POIS:[null],
-            order:[null],
-            components:[null],
-            location:[null],
+            pois:[],
+            order:[],
+            components:[],
+            location:[],
             lasteditat:now,
             createdat:now
         }
-        indexwithpipeline(stop,'stops','rename_id')
+        indexwithpipeline(newStop,'stops','rename_id')
         const body = {
             "script" : {
                 "source": "if (ctx._source.stops == null) {ctx._source.stops = new ArrayList();} ctx._source.stops.add(params.stop);",
                 "lang": "painless",
                 "params" : {
-                    "stop" : stopId
+                    "stop" : stop.id
                 }
             }
         }
         update(body, 'users',context.getUser().id)
     },
-    setPoi: async (_:any,args:any,context:any) => {
-        const poiId = "po_" + uuid()
-        const parentid = args.parentid == undefined ? '': args.parentid
-        let poi = {
-            id:poiId,
+    setPoi: async (_:any,{poi}:any,context:any) => {
+        poi = JSON.parse(poi)
+        console.log(poi)
+        let newPoi = {
+            id:poi.id,
             ownerid: context.getUser().id,
             ownername:context.getUser().name,
-            type:args.type,
-            parentids:[parentid],
-            name: args.name,
+            type:poi.type,
+            parentids:[],
+            name: poi.name,
             image:"",
-            order:[null],
-            components:[null],
-            location:[null],
+            order:[],
+            components:[],
+            location:[],
             lasteditat:now,
             createdat:now
         }
-        indexwithpipeline(poi,'pois','rename_id')
+        indexwithpipeline(newPoi,'pois','rename_id')
         const body = {
             "script" : {
                 "source": "if (ctx._source.pois == null) {ctx._source.pois = new ArrayList();} ctx._source.pois.add(params.stop);",
                 "lang": "painless",
-                "params" : {
-                    "stop" : poiId
+                "params" : {    
+                    "stop" : poi.id
                 }
             }
         }
         update(body, 'users',context.getUser().id)
     },
-    setComponent: async (_:any,args:any,context:any) => {
+    setComponent:async (_:any,{parentHtype, component}:any,context:any) => {
+        console.log(parentHtype)
+        console.log(component)
+        parentHtype = JSON.parse(parentHtype)
+        component = JSON.parse(component)
+        const type = findHtype(parentHtype.id)
+        const user = context.getUser()
+        try{
+        await update({
+            doc: {
+                components:parentHtype.components,
+                lasteditat:now
+            }}
+        ,type,parentHtype.id)
+        } catch(error) {
+            console.error(error)
+        }
+        try{
+            await indexwithpipeline({
+                id: component.id,
+                ownerid:user.id,
+                ownername:user.name,
+                parentid:parentHtype.id,
+                content:JSON.parse(component.content),
+                type:component.type,
+                lasteditat:now,
+                createdat:now,
+                }
+        ,'components','rename_id')
+            }catch(error){console.error(error)}
+        return true
+    }
+   /* setComponent: async (_:any,args:any,context:any) => {
           const htypeid = cookie.parse(context.req.headers.cookie).hid || args.parentid
           const content = JSON.parse(args.content.split("'").join('"'))
           const componentId = "cp_" + uuid()
@@ -117,5 +158,5 @@ export default  {
         }
         update(body, 'routes',htypeid)
         return component
-      },
+      },*/
 }

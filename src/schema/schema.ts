@@ -5,27 +5,30 @@ type Query {
     getRoutes:[Route]
     getStops:[Stop]
     getPois:[Poi]
-    getHtypeWithComponents:HtypeWithComponent
+    getComponents(ids:String):[Component]
+    getHtypeWithComponents(id:String):HtypeWithComponent
     me: User
 }
 type Mutation {
     setUser(name:String!,email:String!, password:String!):AuthPayload
-    setRoute(name:String):Route
-    setStop:Stop
-    setPoi:Poi
-    setComponent(content:String, type:String, parentid:String, htype:String):Component
+    setRoute(route:String!):Route
+    setStop(stop:String!):Stop
+    setPoi(poi:String!):Poi
+    setComponent(component:String, parentHtype:String):Boolean
     deleteUser(id:ID):User
     deleteRoute(id:ID):Route
     deleteStop(id:ID):Stop
     deletePoi(id:ID):Poi
-    deleteComponent(id:ID):Component
-    updateUser(id:ID, name:String, htypeid:String, htype:String):User
+    deleteComponent(parentHtype:String, component:String):Boolean
+    updateUser(id:ID, name:String, htypeids:[String], htype:String):Boolean
     updateRoute(id:ID, name:String):Route
-    updateStop(id:ID):Stop
+    updateStop(id:ID):Stop  
     updatePoi(id:ID):Poi
-    updateComponent(id:ID):Component
+    updateHtype(htype:String):Boolean
+    updateComponent(parentHtype:String, component:String):Boolean
     login(email: String!, password: String!): AuthPayload
     logout: Boolean
+    syncInputScreen(htype:String, components:String):Boolean
 }
 
 
@@ -33,11 +36,11 @@ type File {
     filename: String!
     mimetype: String!
     encoding: String!
-  }
+}
 
 type AuthPayload {
     user: User
-  }
+}
 
 type HtypeWithComponent {
     htype: Htype,
@@ -83,7 +86,7 @@ type Stop {
     ownername:String
     name: String
     image:File
-    POIS:[String]
+    pois:[String]
     components:[String]
     images:[File]
     location:Location

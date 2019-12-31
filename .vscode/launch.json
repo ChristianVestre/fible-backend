@@ -12,7 +12,7 @@
             "runtimeExecutable": "npm",
             "runtimeArgs": ["start", "debug"],
             "port": 8000
-          },
+        },
         {
             "type": "node",
             "request": "launch",
@@ -20,11 +20,37 @@
             "protocol": "inspector",
             "runtimeExecutable": "npm",
             "runtimeArgs": [
-                "run",
                 "start"
             ],
-            "port": 8000
+            "port": 9229
         },
-    ]
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch server debug",
+            "program": "${workspaceRoot}/node_modules/ts-node-dev/bin/ts-node-dev",
+            "args": [
+                "--inspect",
+                "--no-notify",
+                "--respawn",
+                "--transpileOnly",
+                "./src"
+            ],
+            "protocol": "inspector",
+            "internalConsoleOptions": "openOnSessionStart",
+            "port": 9229
+        },
+            {
+                "type": "node",
+                "request": "attach",
+                "name": "Typescript Server",
+                // "processId": "${command:PickProcess}",
+                "protocol": "inspector",
+                "port": 8000,
+                "restart": true,
+                "localRoot": "${workspaceFolder}",
+                "remoteRoot": "."
+            }
+        ]
 }
 
